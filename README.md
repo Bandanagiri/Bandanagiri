@@ -1,4 +1,2 @@
-- 👋 Hi, I’m @Bandanagiri
-- 👀 I’m interested in cybersecurity
-- 🌱 I’m currently learning cse
-
+AIML 2025
+https://github.com/Bandanagiri
