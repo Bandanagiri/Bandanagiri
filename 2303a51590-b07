@@ -1,0 +1,403 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyM0UXNH7YuzJ7U5Z90Hzf/g",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Bandanagiri/Bandanagiri/blob/main/2303a51590-b07\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Prediction of dresses in garment sales**"
+      ],
+      "metadata": {
+        "id": "nidAh4phTZkF"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "1. Identify the top 5 materials mpost used for garment making?\n",
+        "2. Identify the seasons with most garment usage?\n",
+        "3. Find the max and min size of garments made for customers.\n",
+        "4. Name the top 5 decoration,fabric type used to make garments\n",
+        "5. Identify the costliest stylish garment prepared for customers\n",
+        "6. Apply either classification Model or Clustering Model to evaluate the dataset"
+      ],
+      "metadata": {
+        "id": "ZAOWyt_6TkEa"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd"
+      ],
+      "metadata": {
+        "id": "a570av0oavYf"
+      },
+      "execution_count": 19,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data0 = pd.read_csv(\"/content/Attribute dataset.csv\")\n",
+        "data1 = pd.read_csv(\"/content/DressSales.csv\")"
+      ],
+      "metadata": {
+        "id": "Doet6rREa5e2"
+      },
+      "execution_count": 20,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(data0.head())\n",
+        "print(data1.head())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Db4aJcjlbH3-",
+        "outputId": "5b2e43c6-2812-4aeb-975e-b5f36592f276"
+      },
+      "execution_count": 21,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "     Dress_ID    Style    Price  Rating Size  Season NeckLine SleeveLength  \\\n",
+            "0  1006032852     Sexy      Low     4.6    M  Summer   o-neck    sleevless   \n",
+            "1  1212192089   Casual      Low     0.0    L  Summer   o-neck        Petal   \n",
+            "2  1190380701  vintage     High     0.0    L  Automn   o-neck         full   \n",
+            "3   966005983    Brief  Average     4.6    L  Spring   o-neck         full   \n",
+            "4   876339541     cute      Low     4.5    M  Summer   o-neck    butterfly   \n",
+            "\n",
+            "        Material FabricType  Decoration Pattern Type  Recommendation  \n",
+            "0            NaN    chiffon     ruffles       animal               1  \n",
+            "1     microfiber        NaN     ruffles       animal               0  \n",
+            "2       polyster        NaN         NaN        print               0  \n",
+            "3           silk    chiffon  embroidary        print               1  \n",
+            "4  chiffonfabric    chiffon         bow          dot               0  \n",
+            "     Dress_ID  29-08-2013  31-08-2013  09-02-2013  09-04-2013  09-06-2013  \\\n",
+            "0  1006032852        2114        2274        2491        2660        2727   \n",
+            "1  1212192089         151         275         570         750         813   \n",
+            "2  1190380701           6           7           7           7           8   \n",
+            "3   966005983        1005        1128        1326        1455        1507   \n",
+            "4   876339541         996        1175        1304        1396        1432   \n",
+            "\n",
+            "   09-08-2013  09-10-2013 09-12-2013 14-09-2013  ... 24-09-2013 26-09-2013  \\\n",
+            "0        2887        2930       3119       3204  ...       3554     3624.0   \n",
+            "1        1066        1164       1558       1756  ...       2710     2942.0   \n",
+            "2           8           9         10         10  ...         11       11.0   \n",
+            "3        1621        1637       1723       1746  ...       1878     1892.0   \n",
+            "4        1559        1570       1638       1655  ...       2032     2156.0   \n",
+            "\n",
+            "  28-09-2013 30-09-2013  10-02-2013  10-04-2013  10-06-2013  10-08-2013  \\\n",
+            "0       3706     3746.0      3795.0      3832.0        3897      3923.0   \n",
+            "1       3258     3354.0      3475.0      3654.0        3911      4024.0   \n",
+            "2         11       11.0        11.0        11.0          11        11.0   \n",
+            "3       1914     1924.0      1929.0      1941.0        1952      1955.0   \n",
+            "4       2252     2312.0      2387.0      2459.0        2544      2614.0   \n",
+            "\n",
+            "   10-10-2013  10-12-2013  \n",
+            "0      3985.0        4048  \n",
+            "1      4125.0        4277  \n",
+            "2        11.0          11  \n",
+            "3      1959.0        1963  \n",
+            "4      2693.0        2736  \n",
+            "\n",
+            "[5 rows x 24 columns]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Example assuming 'material' is in data0 and 'Dress_ID' is the common column\n",
+        "material_data = data0[['Dress_ID']]  # Adjust column names based on your dataset\n",
+        "\n",
+        "# Merge material data with the sales data on 'Dress_ID'\n",
+        "merged_data = pd.merge(data1, material_data, on='Dress_ID', how='left')\n",
+        "\n",
+        "# Now count the top 5 materials\n",
+        "material_counts = merged_data['Dress_ID'].value_counts()\n",
+        "\n",
+        "# Display the top 5 materials\n",
+        "top_5_materials = material_counts.head(5)\n",
+        "print(top_5_materials)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1PTQceFLbvQs",
+        "outputId": "1bb92817-4d25-4c2f-d0b6-0b367472b038"
+      },
+      "execution_count": 29,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Dress_ID\n",
+            "1006032852    1\n",
+            "1104504876    1\n",
+            "886501087     1\n",
+            "858212832     1\n",
+            "945651303     1\n",
+            "Name: count, dtype: int64\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "season_counts = data0['Season'].value_counts()\n",
+        "top_5_seasons = season_counts.head(5)\n",
+        "print(top_5_seasons)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "k6z8G_WqdG5I",
+        "outputId": "17a740c7-7d69-4b3d-bc3b-d3d94e910a8a"
+      },
+      "execution_count": 32,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Season\n",
+            "Summer    154\n",
+            "Spring    116\n",
+            "Winter     94\n",
+            "Automn     59\n",
+            "winter     45\n",
+            "Name: count, dtype: int64\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(data0['Size'].unique())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "PBG06lyxd1Oa",
+        "outputId": "a1fe4141-107e-4290-e3d6-a52cdb4c245f"
+      },
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['M' 'L' 'XL' 'free' 'S' 'small' 's']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "size_order = ['S', 'M', 'L', 'XL']\n",
+        "data0['Size'] = pd.Categorical(data0['Size'], categories=size_order, ordered=True)\n",
+        "min_size = data0['Size'].min()\n",
+        "max_size = data0['Size'].max()\n",
+        "print(f\"Min Size: {min_size}\")\n",
+        "print(f\"Max Size: {max_size}\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "acIUUtTXeEAj",
+        "outputId": "d35fe943-3012-45cf-f136-a286bc2d5be3"
+      },
+      "execution_count": 36,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Min Size: S\n",
+            "Max Size: XL\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "top_5_decorations = data0['Decoration'].value_counts().head(5)\n",
+        "top_5_fabric_types = data0['FabricType'].value_counts().head(5)\n",
+        "print(\"Top 5 Decorations:\")\n",
+        "print(top_5_decorations)\n",
+        "print(\"\\nTop 5 Fabric Types:\")\n",
+        "print(top_5_fabric_types)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pk73cv_xeQaz",
+        "outputId": "d5ed80e2-7dfc-4dba-a055-03fd8922297f"
+      },
+      "execution_count": 37,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Top 5 Decorations:\n",
+            "Decoration\n",
+            "lace         67\n",
+            "sashes       41\n",
+            "beading      22\n",
+            "hollowout    21\n",
+            "applique     20\n",
+            "Name: count, dtype: int64\n",
+            "\n",
+            "Top 5 Fabric Types:\n",
+            "FabricType\n",
+            "chiffon       129\n",
+            "broadcloth     29\n",
+            "worsted        18\n",
+            "jersey         12\n",
+            "shiffon         8\n",
+            "Name: count, dtype: int64\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(data1.head())  # Display the first few rows\n",
+        "print(data1.columns)  # Check all column names\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "J8ogxF8Ne4Ng",
+        "outputId": "bc22a2ed-fb7a-48ad-e80b-2e6a8a6933a4"
+      },
+      "execution_count": 49,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "     Dress_ID  29-08-2013  31-08-2013  09-02-2013  09-04-2013  09-06-2013  \\\n",
+            "0  1006032852        2114        2274        2491        2660        2727   \n",
+            "1  1212192089         151         275         570         750         813   \n",
+            "2  1190380701           6           7           7           7           8   \n",
+            "3   966005983        1005        1128        1326        1455        1507   \n",
+            "4   876339541         996        1175        1304        1396        1432   \n",
+            "\n",
+            "   09-08-2013  09-10-2013 09-12-2013 14-09-2013  ... 24-09-2013 26-09-2013  \\\n",
+            "0        2887        2930       3119       3204  ...       3554     3624.0   \n",
+            "1        1066        1164       1558       1756  ...       2710     2942.0   \n",
+            "2           8           9         10         10  ...         11       11.0   \n",
+            "3        1621        1637       1723       1746  ...       1878     1892.0   \n",
+            "4        1559        1570       1638       1655  ...       2032     2156.0   \n",
+            "\n",
+            "  28-09-2013 30-09-2013  10-02-2013  10-04-2013  10-06-2013  10-08-2013  \\\n",
+            "0       3706     3746.0      3795.0      3832.0        3897      3923.0   \n",
+            "1       3258     3354.0      3475.0      3654.0        3911      4024.0   \n",
+            "2         11       11.0        11.0        11.0          11        11.0   \n",
+            "3       1914     1924.0      1929.0      1941.0        1952      1955.0   \n",
+            "4       2252     2312.0      2387.0      2459.0        2544      2614.0   \n",
+            "\n",
+            "   10-10-2013  10-12-2013  \n",
+            "0      3985.0        4048  \n",
+            "1      4125.0        4277  \n",
+            "2        11.0          11  \n",
+            "3      1959.0        1963  \n",
+            "4      2693.0        2736  \n",
+            "\n",
+            "[5 rows x 24 columns]\n",
+            "Index(['Dress_ID', '29-08-2013', '31-08-2013', '09-02-2013', '09-04-2013',\n",
+            "       '09-06-2013', '09-08-2013', '09-10-2013', '09-12-2013', '14-09-2013',\n",
+            "       '16-09-2013', '18-09-2013', '20-09-2013', '22-09-2013', '24-09-2013',\n",
+            "       '26-09-2013', '28-09-2013', '30-09-2013', '10-02-2013', '10-04-2013',\n",
+            "       '10-06-2013', '10-08-2013', '10-10-2013', '10-12-2013'],\n",
+            "      dtype='object')\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Mapping 'Price' categories to numeric values in data0\n",
+        "price_mapping = {'Low': 1, 'Average': 2, 'High': 3}\n",
+        "data0['Price'] = data0['Price'].map(price_mapping)\n",
+        "\n",
+        "# Ensure 'Price_numeric' exists and is valid\n",
+        "if 'Price_numeric' not in data0.columns or data0['Price_numeric'].isnull().all():\n",
+        "    print(\"Error: 'Price' column is missing or invalid. Please check the 'Price' mapping.\")\n",
+        "else:\n",
+        "    # Sort by 'Price_numeric' and find the costliest garment\n",
+        "    costliest_garment = data0.sort_values(by='Price_numeric', ascending=False).iloc[0]\n",
+        "\n",
+        "    # Print the details of the most expensive garment\n",
+        "    print(\"Costliest Stylish Garment:\")\n",
+        "    print(costliest_garment[['Dress_ID', 'Style', 'Price', 'Price_numeric', 'Rating', 'Size', 'Season']])\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-hX4yL25hrgx",
+        "outputId": "0c88c0b8-bbc5-4302-811f-8ad323465962"
+      },
+      "execution_count": 56,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Error: 'Price' column is missing or invalid. Please check the 'Price' mapping.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
